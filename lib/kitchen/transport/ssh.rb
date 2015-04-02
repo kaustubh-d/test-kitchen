@@ -305,7 +305,8 @@ module Kitchen
           :timeout                => data[:connection_timeout],
           :connection_retries     => data[:connection_retries],
           :connection_retry_sleep => data[:connection_retry_sleep],
-          :max_wait_until_ready   => data[:max_wait_until_ready]
+          :max_wait_until_ready   => data[:max_wait_until_ready],
+          :send_env               => data[:export_env_vars]
         }
 
         opts[:keys_only] = true                     if data[:ssh_key]
