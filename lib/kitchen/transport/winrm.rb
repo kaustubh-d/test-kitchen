@@ -220,7 +220,7 @@ module Kitchen
           @service = ::WinRM::WinRMWebService.new(*service_args)
           closer = WinRM::Transport::ShellCloser.new("#{self}", logger.debug?, service_args)
 
-          executor = WinRM::Transport::CommandExecutor.new(@service, logger, closer)
+          executor = WinRM::Transport::CommandExecutor.new(@service, logger, closer, options)
           retryable(opts) do
             logger.debug("[WinRM] opening remote shell on #{self}")
             shell_id = executor.open
@@ -387,6 +387,8 @@ module Kitchen
       # @return [Hash] hash of connection options
       # @api private
       def connection_options(data)
+        env_key_vals = data[:export_env_vars].flat_map { |e| [e, ENV[e]] }
+        shell_opts = { env_vars: Hash[*env_key_vals] }
         opts = {
           :instance_name          => instance.name,
           :kitchen_root           => data[:kitchen_root],
@@ -400,7 +402,8 @@ module Kitchen
           :rdp_port               => data[:rdp_port],
           :connection_retries     => data[:connection_retries],
           :connection_retry_sleep => data[:connection_retry_sleep],
-          :max_wait_until_ready   => data[:max_wait_until_ready]
+          :max_wait_until_ready   => data[:max_wait_until_ready],
+          :shell_opts             => shell_opts
         }
 
         opts
